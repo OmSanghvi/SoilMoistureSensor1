@@ -1,0 +1,62 @@
+#include <LiquidCrystal.h>
+LiquidCrystal lcd(8, 6, 5, 4, 3,2);
+
+int sensorPin = A0;
+int sensorValue = 0;
+int percentValue = 0;
+int ledPin = 6;
+int potValue = 0;      
+int brightness = 0;    
+int pBari = 0;        
+int i = 0; 
+byte pBar[8] = {
+  B11111,
+  B11111,
+  B11111,
+  B11111,
+  B11111,
+  B11111,
+  B11111,
+};
+
+void setup() {
+  Serial.begin(9600);
+  lcd.begin(16, 2);
+  pinMode(ledPin, OUTPUT); 
+  lcd.createChar(0, pBar);
+  
+}
+void loop() {
+  potValue = analogRead(sensorPin);        
+  // turns the potValue into a brightness for the LED
+  brightness=map(potValue, 0, 1024, 0, 255); 
+  //lights up the LED according to the bightness
+  analogWrite(ledPin, brightness); 
+  // turns the brighness into a percentage for the bar 
+  pBari=map(brightness, 0, 255, 0, 17);
+  //prints the progress bar
+  for (i=0; i < pBari; i++)
+  {
+    lcd.setCursor(i, 1);   
+    lcd.write(byte(0));  
+  }
+  // delays 750 ms
+  delay(750);        
+  sensorValue = analogRead(sensorPin);
+  Serial.print("\n\nAnalog Value: ");
+  Serial.print(sensorValue);
+  
+  percentValue = map(sensorValue, 1023, 200, 0, 100);
+  Serial.print("\nPercentValue: ");
+  Serial.print(percentValue);
+  Serial.print("%");
+  lcd.setCursor(0, 0);
+  lcd.print("Soil Moisture");
+  
+  lcd.setCursor(0, 1);  
+  lcd.print("Percent: ");
+  lcd.print(percentValue);
+  lcd.print("%");
+  delay(12000);
+  lcd.clear();
+}
